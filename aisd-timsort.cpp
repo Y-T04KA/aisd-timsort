@@ -1,11 +1,7 @@
 #include <iostream>
-/*В реализации должны быть выполнены все основные элементы алгоритма: 
-+сортировка вставками, +?поиск последовательностей run, +подсчёт minrun, 
-+слияние последовательностей run, режим галопа при слиянии.*/
 
 using namespace std;
 
-//сортировка вставками - чек
 void insertionsort(int arr[], int left, int right) {
 	for (int i = left + 1; i <= right; i++) {
 		int temp = arr[i];
@@ -17,7 +13,7 @@ void insertionsort(int arr[], int left, int right) {
 		arr[j + 1] = temp;
 	}
 }
-//минран - чек
+
 int minrunlenght(int n) {
 	bool flag = 0;
 	while (n >= 64) {
@@ -26,19 +22,19 @@ int minrunlenght(int n) {
 	}
 	return n + flag;
 }
-int binSearch(int arr[] , int key, int lenght) {  // Запускаем бинарный поиск
-	int l = -1;                      // l, r — левая и правая границы
+int binSearch(int arr[] , int key, int lenght) { 
+	int l = -1;                      
 	int r = lenght;
 	int m;
-	while (l < r - 1) {                // Запускаем цикл
-		m = (l + r) / 2;            // m — середина области поиска
+	while (l < r - 1) {               
+		m = (l + r) / 2;            
 		if (arr[m] < key) { l = m; }
 		else
 			r = m;
-	}                  // Сужение границ
+	}                  
 	return r;
 }
-//слияние ранов - чек
+
 void merge(int arr[], int l, int m, int r){
 	int len1 = m - l + 1, len2 = r - m;
 	int* left = new int[len1];
@@ -47,32 +43,20 @@ void merge(int arr[], int l, int m, int r){
 		left[i] = arr[l + i];
 	for (int i = 0; i < len2; i++)
 		right[i] = arr[m + 1 + i];
-	//gallop?
-	/*if (left[len1 - 1] <= right[0]) {//случай когда правый массив больше левого
-		for (int w = 0; w < len1; ++w) {
-	    	arr[w] = left[w];//тупо последовательно копируем левый, а потом правый
-			arr[len1 + w] = right[w];
-			}
-		}
-	if (right[len2 - 1] <= left[0]) {//наоборот
-		for (int w = 0; w < len2; ++w) {
-			arr[w] = right[w];//тупо последовательно копируем правый, а потом левый
-			arr[len2 + w] = left[w];
-		}
-	}*/
-	if (left[len1 - 1] > right[0] /*&& left[len1 - 1] < right[len2 - 1]*/) {//когда правый начинается в левом
-		int middle = -1;//кажется тут не учитывается случай когда правый начинается и заканчивается в левом
+	//gallop? nedogallop?
+		/*if (left[len1 - 1] > right[0] )*/ {
+		int middle = -1;
 		for (int w = right[0]; w > left[0]; --w) {
-			middle = binSearch(left, w, len1);//смотрим позицию в левом массиве после которой
-			if (middle != -1) break;//можно будет впихнуть правый
+			middle = binSearch(left, w, len1);//look for position in left part where we can put right part
+			if (middle != -1) break;
 		}
-		for (int w = 0; w > middle; ++w) {//пихаем первую часть левого
+		for (int w = 0; w > middle; ++w) {//put left part before beginning of right part
 			arr[w] = left[w];
 		}
 		int e = 0;
 		int w = middle;
-		while (middle < len1) {//тут мы суём из левого или правого (смотря что меньше)
-			if (left[middle] < right[e]) {//пока не дойдём до конца левого
+		while (middle < len1) {//compare left and right parts, put the least until we reach the end of left part
+			if (left[middle] < right[e]) {
 				arr[w] = left[middle];
 				w++;
 				middle++;
@@ -83,62 +67,10 @@ void merge(int arr[], int l, int m, int r){
 				e++;
 			}
 		}
-		for (int r = e + 1; e < len2; ++r) {
+		for (int r = e + 1; e < len2; ++r) {//put all other from right
 			arr[++w] = right[r];
 		}
 	}
-	else {
-		int middle = -1;
-		for (int w = left[0]; w > right[0]; --w) {
-			middle = binSearch(right, w, len2);
-			if (middle != -1) break;
-		}
-		for (int w = 0; w > middle; ++w) {
-			arr[w] = right[w];
-		}
-		int e = 0;
-		int w = middle;
-		while (middle < len2) {
-			if (right[middle] < left[e]) {
-				arr[w] = right[middle];
-				w++;
-				middle++;
-			}
-			else {
-				arr[w] = left[e];
-				w++;
-				e++;
-			}
-		}
-		for (int r = e + 1; e < len1; ++r) {
-			arr[++w] = left[r];
-		}
-	}
-	/*int i = 0, j = 0, k = l;
-	while (i < len1 && j < len2)
-	{
-		if (left[i] <= right[j])
-		{
-			arr[k] = left[i];
-			i++;
-		}
-		else
-		{
-			arr[k] = right[j];
-			j++;
-		}
-		k++;
-	}
-	while (i < len1) {
-		arr[k] = left[i];
-		k++;
-		i++;
-	}
-	while (j < len2) {
-		arr[k] = left[i];
-		k++;
-		j++;
-	}*/
 	delete[]left;
 	delete[]right;
 }
@@ -162,7 +94,8 @@ void printarr(int arr[], int n) {
 };
 
 int main() {
-	int arr[] = {-2,7,15,-14,0,15,0,7,-7,-4,-13,5,8,-14,12,9,-8};
+	//int arr[] = {-2,7,15,-14,0,15,0,7,-7,-4,-13,5,8,-14,12,9,-8};
+	int arr[] = { -4,-26,-10, 4,-18,-22,-5,-25,-6,-9,-11,-15, 2,22,23,27,24, 8,25,-1,13,21, 0,15,12,-21, 3, 1,19,17,30,-7,-27,-19,28,20,10,-14,-16, 5,16,18,-17,-23,-2,-24, 7,-8, 9,11,26,-12,-13,14,29,-30, 6, 3,-29,-20,-28 };
 	int n = sizeof(arr) / sizeof(arr[0]);
 	timsort(arr, n);
 	printarr(arr, n);
